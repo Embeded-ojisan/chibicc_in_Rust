@@ -8,5 +8,9 @@ edition = "2021"
 [dependencies]
 
 [[bin]]
+name = "step1"
+path = "examples/step1.rs"
+
+[[bin]]
 name = "test"
 path = "examples/test.rs"
