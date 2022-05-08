@@ -7,6 +7,8 @@ use std::fs;
 use std::io::Write;
 use std::io::Read;
 use std::io::BufReader;
+use std::fs::OpenOptions;
+
 
 fn main()
 {
@@ -18,8 +20,9 @@ fn main()
         eprintln!("引数に異常あり：{}", num);
     }
 
-    let AsmFilename = args.pop();
-    let mut AsmFile = fs::File::create(AsmFilename.unwrap()).unwrap();
+    let AsmFilename = args.pop().unwrap();
+//    let mut AsmFile = fs::File::create(AsmFilename).unwrap();
+    let mut AsmFile = OpenOptions::new().read(true).write(true).open(AsmFilename).unwrap();
 
     AsmFile.write_all(b".intel_syntax noprefix\n").unwrap();
     AsmFile.write_all(b".global main\n").unwrap();
@@ -30,8 +33,13 @@ fn main()
 //    AsmFile.write_all(formula.bytes().unwrap()).unwrap();
 
     let mut FormulaFile = fs::File::create("tmp_formula_step2").unwrap();
+    let mut FormulaFile = OpenOptions::new().read(true).write(true).open("tmp_formula_step2").unwrap();
     FormulaFile.write_all(args.pop().unwrap().as_bytes());
-    let mut buf = BufReader::new(FormulaFile).bytes();
+    
+    let mut FormulaFile = fs::File::create("tmp_formula_step2").unwrap();
+    let mut FormulaFile = OpenOptions::new().read(true).write(true).open("tmp_formula_step2").unwrap();
+    let mut buf = [0; 256];
+    println!("{}\n", FormulaFile.read(&mut buf).expect("something went wrong reading the file"));
 
-    println!("{:x}", buf);
+    println!("{:?}", buf);
 }
