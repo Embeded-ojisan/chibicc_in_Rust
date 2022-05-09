@@ -32,6 +32,7 @@ fn main()
 //    let mut formula = args.pop().unwrap();
 //    AsmFile.write_all(formula.bytes().unwrap()).unwrap();
 
+/*
     let mut FormulaFile = fs::File::create("tmp_formula_step2").unwrap();
     let mut FormulaFile = OpenOptions::new().read(true).write(true).open("tmp_formula_step2").unwrap();
     FormulaFile.write_all(args.pop().unwrap().as_bytes());
@@ -40,6 +41,10 @@ fn main()
     let mut FormulaFile = OpenOptions::new().read(true).write(true).open("tmp_formula_step2").unwrap();
     let mut buf = [0; 256];
     println!("{}\n", FormulaFile.read(&mut buf).expect("something went wrong reading the file"));
+*/
+//    let mut bytes = args.pop().unwrap().as_bytes();
+//    AsmFile.write_all(&args.pop().unwrap().as_bytes().iter().next().unwrap());
+    println!("{}", args.pop().unwrap().as_bytes().iter().next().unwrap());
 
-    println!("{:?}", buf);
+//    println!("{:?}", buf);
 }
