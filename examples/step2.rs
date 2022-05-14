@@ -22,15 +22,23 @@ fn main()
     }
 
     let AsmFilename = args.pop().unwrap();
+    let AsmFileReslt = fs::File::open(AsmFilename.clone());
+    match AsmFileReslt
+    {
+        Ok(v) =>{
+            fs::remove_file(AsmFilename.clone()).unwrap();
+        }
+        Err(e) =>{
+        }
+    }
+
+    let mut AsmFile = fs::File::create(AsmFilename.clone()).unwrap();
     let mut AsmFile = OpenOptions::new().read(true).write(true).open(AsmFilename).unwrap();
 
     AsmFile.write_all(b".intel_syntax noprefix\n").unwrap();
     AsmFile.write_all(b".global main\n").unwrap();
     AsmFile.write_all(b"main:\n").unwrap();
     AsmFile.write_all(b" mov rax, ").unwrap();
-
-//    let mut formula = args.pop().unwrap();
-//    AsmFile.write_all(formula.bytes().unwrap()).unwrap();
 
     let mut FormulaFile = fs::File::create("tmp_formula_step2").unwrap();
     let mut FormulaFile = OpenOptions::new().read(true).write(true).open("tmp_formula_step2").unwrap();
@@ -39,7 +47,15 @@ fn main()
     FormulaFile.rewind().unwrap();
 
     let mut reader = BufReader::new(FormulaFile).bytes();
-    AsmFile.write_all(&reader.next().unwrap().unwrap()).unwrap();
+    AsmFile.write_all(
+        &reader
+            .next().unwrap().unwrap()
+            .to_string()
+            .parse::<i32>().unwrap()
+            .to_string()
+            .as_bytes()
+    ).unwrap();
 
-//    println!("{}", reader.next().unwrap().unwrap());
+    // クリーンアップ
+//    fs::remove_file("tmp_formula_step2").unwrap();
 }
