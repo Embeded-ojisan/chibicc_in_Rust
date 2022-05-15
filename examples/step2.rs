@@ -40,22 +40,31 @@ fn main()
     AsmFile.write_all(b"main:\n").unwrap();
     AsmFile.write_all(b" mov rax, ").unwrap();
 
-    let mut FormulaFile = fs::File::create("tmp_formula_step2").unwrap();
-    let mut FormulaFile = OpenOptions::new().read(true).write(true).open("tmp_formula_step2").unwrap();
-    FormulaFile.write_all(args.pop().unwrap().as_bytes());
+    let mut buf = args.pop().unwrap().into_bytes();
+    let len = buf.len();
 
-    FormulaFile.rewind().unwrap();
+    let mut temp = String::new(); 
+    for cc in &buf[..len]
+    {
+        if *cc == b'+'
+        {
+            let len = temp.len();
+            temp.insert_str(len, "\n add rax, ");
+            continue;
+        }
 
-    let mut reader = BufReader::new(FormulaFile).bytes();
-    AsmFile.write_all(
-        &reader
-            .next().unwrap().unwrap()
-            .to_string()
-            .parse::<i32>().unwrap()
-            .to_string()
-            .as_bytes()
-    ).unwrap();
+        if *cc == b'-'
+        {
+            let len = temp.len();
+            temp.insert_str(len, "\n sub rax, ");
+            continue;
+        }
 
-    // クリーンアップ
-//    fs::remove_file("tmp_formula_step2").unwrap();
+        let len = temp.len();
+        temp.insert_str(len, &(cc.to_ascii_lowercase()-48).to_string());
+    }
+    let len = temp.len();
+    temp.insert_str(len, "\n ret"); 
+
+    AsmFile.write_all(temp.as_bytes()).unwrap();
 }
