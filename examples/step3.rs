@@ -14,6 +14,66 @@ struct Token {
     kind: TokenKind,
     val: usize,
     str: String,
+    next: Option<Box<Node>>,
+}
+
+struct TokenList {
+    head: Option<Box<Token>>,
+}
+
+impl TokenList{
+    pub fn new() -> TokenList {
+        Self {
+            head: None,
+        }
+    }
+
+    new_token(
+        &mut self,
+        kind: TokenKind,
+        str: &mut String
+    )
+    {
+        let mut new_token = 
+            Token{
+                kind: kind,
+                val: 0,
+                str: str,
+            };
+
+        match self.head {
+            None => self.head = Some(Box::new(new_token);),
+            Some(ref mut head) => {
+                let mut p = head;
+                loop {
+                    match p.next {
+                        None => {
+                            p.next = Some(Box::new(new_token));
+                            break;
+                        },
+                        Some(ref mut next) => p = next;
+                    }
+                }
+            }
+        }
+    }
+
+    pub fn at_eof(&mut self) -> TokenKind {
+        self.kind
+    }
+
+    pub fn consume(&mut self, op: u8) -> bool
+    {
+        if self.len() > 1
+        {
+            let str = self.pop_front().str.as_bytes();
+            if self.kind != TK_RESERVED || str[0] != op
+            {
+                return false;
+            }
+        }
+        return true;
+    }
 }
 
 fn error(args: Arguments)
@@ -21,18 +81,7 @@ fn error(args: Arguments)
     eprintln!("{}/n", args);
 }
 
-fn consume(token: &mut LinkedList<Token>, op: u8) -> bool
-{
-    if token.len() > 1
-    {
-        let str = token.pop_front().str.as_bytes();
-        if token.kind != TK_RESERVED || str[0] != op
-        {
-            return false;
-        }
-    }
-    return true;
-}
+
 
 fn main()
 {
