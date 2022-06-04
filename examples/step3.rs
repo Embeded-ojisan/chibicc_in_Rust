@@ -1,20 +1,31 @@
 use std::collections::LinkedList;
 use std::fmt::*;
 
+use std::fs;
+use std::fs::File;
+use std::fs::OpenOptions;
+
+use std::env;
+
+use std::io::Write;
+use std::io::Read;
+use std::io::BufReader;
+use std::io::Seek;
+
 use crate::TokenKind::*;
 
 #[derive(PartialEq)]
 enum TokenKind {
     TK_RESERVED,
     TK_NUM,
-    TK_EOF
+    TK_EOF,
 }
 
-struct Token {
-    kind: TokenKind,
-    val: usize,
-    str: String,
-    next: Option<Box<Node>>,
+pub struct Token {
+    kind:   TokenKind,
+    val:    usize,
+    str:    String,
+    next:   Option<Box<Token>>,
 }
 
 struct TokenList {
@@ -28,7 +39,7 @@ impl TokenList{
         }
     }
 
-    new_token(
+    pub fn new_token(
         &mut self,
         kind: TokenKind,
         str: &mut String
@@ -36,13 +47,14 @@ impl TokenList{
     {
         let mut new_token = 
             Token{
-                kind: kind,
-                val: 0,
-                str: str,
+                kind:   kind,
+                val:    0,
+                str:    *str,
+                next:   None,
             };
 
         match self.head {
-            None => self.head = Some(Box::new(new_token);),
+            None => self.head = Some(Box::new(new_token)),
             Some(ref mut head) => {
                 let mut p = head;
                 loop {
@@ -51,23 +63,83 @@ impl TokenList{
                             p.next = Some(Box::new(new_token));
                             break;
                         },
-                        Some(ref mut next) => p = next;
+                        Some(ref mut next) => p = next,
                     }
                 }
             }
         }
     }
 
-    pub fn at_eof(&mut self) -> TokenKind {
-        self.kind
+    pub fn get(&self, index: isize) -> Option<Box<Token>>
+    {
+        match self.head
+        {
+            None => return None,
+            Some(ref top) => {
+                let mut p = top;
+                let mut i = 0;
+
+                loop
+                {
+                    if i == index
+                    {
+                        return Some(*p);
+                    }
+
+                    match p.next
+                    {
+                        None => return None,
+                        Some(ref link) => p = link,
+                    }
+                    i += 1;
+                }
+            }
+        }
+    }
+
+    pub fn len(&self) -> usize
+    {
+        let mut count = 1;
+        match self.head
+        {
+            None => 0,
+            Some(ref top) => {
+                let mut p = top;
+
+                loop
+                {
+                    match p.next
+                    {
+                        None => break,
+                        Some(ref link) => {
+                            count += 1;
+                            continue;
+                        }
+                    }
+                }
+
+                return count;
+            }
+        }
+    }
+
+    pub fn at_eof(&mut self) -> Option<TokenKind> {
+        match self.len()
+        {
+            0 => None,
+            _ => {
+                Some(self.head.unwrap().kind)
+            }
+        } 
     }
 
     pub fn consume(&mut self, op: u8) -> bool
     {
         if self.len() > 1
         {
-            let str = self.pop_front().str.as_bytes();
-            if self.kind != TK_RESERVED || str[0] != op
+            let str = self.get(0).unwrap().str.as_bytes();
+            if self.at_eof().unwrap() != TK_RESERVED 
+                || str[0] != op
             {
                 return false;
             }
