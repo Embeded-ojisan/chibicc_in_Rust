@@ -70,7 +70,10 @@ impl TokenList{
         }
     }
 
-    pub fn get(&self, index: isize) -> Option<Box<Token>>
+    pub fn get(
+        &self
+        ,index: isize
+    ) -> Option<Box<Token>>
     {
         match self.head
         {
@@ -97,7 +100,9 @@ impl TokenList{
         }
     }
 
-    pub fn len(&self) -> usize
+    pub fn len(
+        &self
+    ) -> usize
     {
         let mut count = 1;
         match self.head
@@ -123,7 +128,10 @@ impl TokenList{
         }
     }
 
-    pub fn at_eof(&mut self) -> Option<TokenKind> {
+    pub fn at_eof(
+        &mut self
+    ) -> Option<TokenKind>
+    {
         match self.len()
         {
             0 => None,
@@ -146,9 +154,32 @@ impl TokenList{
         }
         return true;
     }
+
+    pub fn tokenize(
+        &mut self
+        ,op: u8
+    )
+    {
+        if self.len() > 1
+        {
+            let str = self.get(0).unwrap().str.as_bytes();
+            loop
+            {
+                if *str == '\0'
+                {
+                    break;
+                }
+            }
+        }
+
+        self.new_token(TK_NUM, op);
+        return;
+    }
 }
 
-fn error(args: Arguments)
+fn error(
+    args: Arguments
+)
 {
     eprintln!("{}/n", args);
 }
