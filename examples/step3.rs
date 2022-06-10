@@ -157,22 +157,66 @@ impl TokenList{
 
     pub fn tokenize(
         &mut self
-        ,op: u8
+        ,op: &mut Vec<u8>
     )
     {
+        let mut index = 0;
         if self.len() > 1
         {
-            let str = self.get(0).unwrap().str.as_bytes();
+            let str = 
+                self
+                    .get(0)
+                    .unwrap()
+                    .str
+                    .into_bytes();
             loop
             {
-                if *str == '\0'
+                if char::from_u32(op[index] as u32).unwrap() == '\0'
                 {
                     break;
                 }
+                else if char::from_u32(op[index] as u32).unwrap() == ' '
+                {
+                    index += 1;
+                    continue;
+                }
+
+                if char::from_u32(op[index] as u32).unwrap() == '+' 
+                || char::from_u32(op[index] as u32).unwrap() == '-'
+                {
+                    index += 1;
+                    self.new_token(
+                        TK_RESERVED
+                        ,&mut String::from_utf8(
+                            op[index..].to_vec()
+                        ).unwrap()
+                    );
+                    continue;
+                }
+                
+                if char::from_u32(op[index] as u32)
+                    .unwrap()
+                    .is_digit(10)
+                       == true
+                {
+                   self.new_token(
+                       TK_NUM
+                       ,&mut String::from_utf8(
+                           op[index..].to_vec()
+                        ).unwrap()
+                   );
+                   continue;
+               }
+
             }
         }
 
-        self.new_token(TK_NUM, op);
+        self.new_token(
+            TK_NUM
+            ,&mut String::from_utf8(
+                op[index..].to_vec()
+            ).unwrap()
+        );
         return;
     }
 }

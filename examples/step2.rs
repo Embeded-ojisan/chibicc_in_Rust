@@ -61,7 +61,10 @@ fn main()
         }
 
         let len = temp.len();
-        temp.insert_str(len, &(cc.to_ascii_lowercase()-48).to_string());
+        temp.insert_str(
+            len
+            , &(cc.to_ascii_lowercase()-48).to_string()
+        );
     }
     let len = temp.len();
     temp.insert_str(len, "\n ret"); 
