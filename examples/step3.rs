@@ -205,6 +205,11 @@ impl TokenList{
                            op[index..].to_vec()
                         ).unwrap()
                    );
+                   self
+                    .get(self.len().try_into().unwrap())
+                    .unwrap()
+                    .val
+                    = op[index] as usize;
                    continue;
                }
 
@@ -219,15 +224,51 @@ impl TokenList{
         );
         return;
     }
+
+    pub fn expect(
+        &mut self
+        ,op: &mut Vec<u8>
+    ) -> Option<usize>
+    {
+        match self.head {
+            None => None,
+            Some(ref mut head) => {
+                let mut p = head;
+                let token = p.kind;
+                let inOp = self.get(0).unwrap().str.as_bytes();
+                match p.next {
+                    None => None,
+                    Some(ref mut next) =>{
+                        if token != TK_RESERVED
+                            || inOp != op 
+                        {
+                            println!("{:?}ではありません", op);
+                        }
+                        
+                        p = next;
+                        Some(1)
+                    },
+                }
+            }
+        }
+    }
+
+    pub fn expect_number(
+        &mut self
+    )
+    {
+        ;
+    }
 }
 
+/*
 fn error(
     args: Arguments
 )
 {
     eprintln!("{}/n", args);
 }
-
+*/
 
 
 fn main()
@@ -259,6 +300,7 @@ fn main()
     AsmFile.write_all(b"main:\n").unwrap();
     AsmFile.write_all(b" mov rax, ").unwrap();
 
+/*
     let Token = tokenize(args.pop().unwrap());
 
     let mut n = expect_number();
@@ -286,5 +328,6 @@ fn main()
     }
 
     AsmFile.write_all(b" ret\n").unwrap();
+*/
 }
 
